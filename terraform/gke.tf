@@ -24,18 +24,22 @@ resource "google_container_cluster" "gke-01" {
 }
 
 # Create a node pool
-resource "google_container_node_pool" "node_pool_01" {
-  name       = "node-pool-01"
+resource "google_container_node_pool" "node_pool_02" {
+  name       = "node-pool-02"
   location   = "asia-southeast1-a"
   cluster    = google_container_cluster.gke-01.name
-  node_count = 2
+  
+  autoscaling {
+    min_node_count = 1  # Số node tối thiểu
+    max_node_count = 5  # Số node tối đa
+  }
 
   node_config {
-    preemptible     = false
-    machine_type    = "e2-micro"
+    spot = true # Sử dụng spot instance để tiết kiệm chi phí
+    machine_type    = "e2-small"
     service_account = "default"
 
-    disk_size_gb = 10
+    disk_size_gb = 15
     disk_type    = "pd-standard"
 
 
@@ -50,20 +54,3 @@ resource "google_container_node_pool" "node_pool_01" {
   }
 }
 
-# Firewall rule to allow traffic within GKE
-resource "google_compute_firewall" "gke_firewall" {
-  name    = "gke-firewall"
-  network = google_compute_network.diemne.name
-
-  allow {
-    protocol = "tcp"
-    ports    = ["0-65535"]  # Nên giới hạn trong production
-  }
-  allow {
-    protocol = "udp"
-    ports    = ["0-65535"]  # Nên giới hạn trong production
-  }
-
-  source_ranges = ["10.1.0.0/20", "10.1.16.0/20", "10.1.32.0/20"]
-  target_tags   = ["gke-node"]
-}

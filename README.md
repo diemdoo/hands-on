@@ -27,8 +27,12 @@ terraform plan   # xem những cái thực thi xóa hay sửa + thêm - xóa
 
 terraform apply     # tạo resource
 
-# file .tfstate KHÔNG ĐƯỢC XÓA, nó chứa các trạng thái các file .tf. Các trạng thái trong file .tfstate nó sẽ hiển thị trên UI
+# file .tfstate KHÔNG ĐƯỢC XÓA, KHÔNG ĐƯỢC ĐẨY LÊN Github, nó chứa các trạng thái các file .tf. Các trạng thái trong file .tfstate nó sẽ hiển thị trên UI
 
+terraform backend: lưu file state lên bucket, sau đó chạy các lệnh: terraform init, terraform plan
+có tính năng lock: chỉ được 1 người chạy terraform
+
+https://viblo.asia/p/terraform-series-bai-7-terraform-backend-understand-backend-924lJRr6lPM 
 
 tìm hiểu terraform gồm những gì? như resource, variables,...
 
@@ -127,8 +131,16 @@ ssh username@IP
   Mỗi resource chỉ hỗ trợ một member duy nhất.
 
 - Create a Cluster GKE(k8s) via terraform(Add cicd via github action )
-  + Timf hieeur GKE (kubenity), cluster 
-
+  + Tìm hiểu GKE (kubenity), cluster 
+  ```
+  Sử dụng spot instance để tiết kiệm chi phí
+  + spot instance            # GCP hết resource thu hồi lại, sau đó tạo spot mới rồi chạy tiếp
+  + preemptible instance     # Chạy trong 24h rồi tắt, bật lại bằng tay
+  + On-Demand Instance       # Chạy liên tục
+  + stateless                # Chỉ có code
+  + statefull                # Lưu db ở code
+  ```
+  + Tính năng auto scaling
 
 
 - Using GitOps Workflow with ArgoCD

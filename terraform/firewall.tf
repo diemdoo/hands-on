@@ -71,3 +71,21 @@ resource "google_compute_firewall" "allow_tailscale_to_console" {
   # target_tags   = ["private"]
   description   = "Allow tailscale access to console"
 }
+
+# Firewall rule to allow traffic within GKE
+resource "google_compute_firewall" "gke_firewall" {
+  name    = "gke-firewall"
+  network = google_compute_network.diemne.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65535"]  # Nên giới hạn trong production
+  }
+  allow {
+    protocol = "udp"
+    ports    = ["0-65535"]  # Nên giới hạn trong production
+  }
+
+  source_ranges = ["10.1.0.0/20", "10.1.16.0/20", "10.1.32.0/20"]
+  target_tags   = ["gke-node"]
+}

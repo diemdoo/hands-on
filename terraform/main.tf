@@ -6,6 +6,10 @@ terraform {
       version = "6.8.0"
     }
   }
+  backend "gcs" {
+    bucket  = "diemne-tfstate"
+    prefix  = "terraform/state"
+  }
 }
 
 provider "google" {
