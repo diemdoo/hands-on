@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Thêm Font Awesome để sử dụng icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .task-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .task-item.completed {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-actions {
+            display: flex;
+            gap: 5px; /* Khoảng cách giữa các nút */
+        }
+        .btn-action {
+            width: 35px; /* Kích thước nút nhỏ gọn */
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+        .btn-toggle {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .btn-toggle:hover {
+            background-color: #d4d7da;
+        }
+        .btn-edit {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-edit:hover {
+            background-color: #0056b3;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-delete:hover {
+            background-color: #b02a37;
+        }
+        .btn-clear {
+            margin-top: 20px;
+        }
+        .pagination {
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .task-details {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="task-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Task Manager</h1>
+            <div>
+                <span class="me-2">Welcome, {{ current_user.username }}!</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="mb-4">
+            <div class="mb-3">
+                <label for="task" class="form-label">Task</label>
+                <input type="text" name="task" id="task" class="form-control" placeholder="Add a task" required>
+            </div>
+            <div class="mb-3">
+                <label for="details" class="form-label">Details (optional, max 100 characters)</label>
+                <textarea name="details" id="details" class="form-control" placeholder="Add details for this task" maxlength="100"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Task</button>
+        </form>
+
+        {% if tasks.items %}
+        <div class="task-list">
+            {% for task in tasks.items %}
+            <div class="task-item {% if task.completed %}completed{% endif %}">
+                <div>
+                    <span>{{ task.description }}</span>
+                    {% if task.details %}
+                    <div class="task-details">{{ task.details }}</div>
+                    {% endif %}
+                </div>
+                <div class="task-actions">
+                    <a href="{{ url_for('toggle', task_id=task.id) }}" class="btn btn-action btn-toggle" title="{% if task.completed %}Undo{% else %}Done{% endif %}">
+                        <i class="fas fa-check"></i>
+                    </a>
+                    <a href="{{ url_for('edit', task_id=task.id) }}" class="btn btn-action btn-edit" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{{ url_for('delete', task_id=task.id) }}" class="btn btn-action btn-delete" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-muted">No tasks yet. Add one above!</p>
+        {% endif %}
+
+        {% if tasks.items %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if tasks.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('index', page=tasks.prev_num) }}">Previous</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+                {% endif %}
+                {% if tasks.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('index', page=tasks.next_num) }}">Next</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% if tasks.items %}
+        <div class="text-center">
+            <a href="{{ url_for('clear') }}" class="btn btn-danger btn-clear">Clear All</a>
+        </div>
+        {% endif %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
