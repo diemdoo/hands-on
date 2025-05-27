@@ -3,8 +3,8 @@ run-name: Build Image
 
 on:
   push:
-    branches: ['main']
-
+    paths:
+      - 'todo-app/**'
 jobs:
   build-image:
     runs-on: ubuntu-latest
