@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: todo-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: ghcr.io/diemdoo/hands-on
+    chart: todo-app
+    targetRevision: 0.1.0
+    helm:
+      values: |
+        image:
+          repository: ghcr.io/diemdoo/hands-on/todo-app
+          pullPolicy: IfNotPresent
+          tag: "b32582f"
+        replicaCount: 1
+        service:
+          type: ClusterIP
+        ingress:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: todo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

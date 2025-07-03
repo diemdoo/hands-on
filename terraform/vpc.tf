@@ -34,6 +34,16 @@ resource "google_compute_subnetwork" "private_subnet" {
   }
 }
 
+# Create DB Subnet
+resource "google_compute_subnetwork" "db_subnet" {
+  name          = "diemne-db-subnet"
+  ip_cidr_range = "10.2.0.0/20"  # Dải IP không trùng với các subnet khác
+  region        = "asia-southeast1"
+  network       = google_compute_network.diemne.id
+  description   = "Private subnet for Cloud SQL instances"
+  private_ip_google_access = true  # Bật private Google access
+}
+
 # Create Cloud Router for NAT
 resource "google_compute_router" "router" {
   name    = "diemne-router"

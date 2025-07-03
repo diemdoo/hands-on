@@ -30,13 +30,13 @@ resource "google_container_node_pool" "node_pool_02" {
   cluster    = google_container_cluster.gke-01.name
   
   autoscaling {
-    min_node_count = 1  # Số node tối thiểu
+    min_node_count = 2  # Số node tối thiểu
     max_node_count = 5  # Số node tối đa
   }
 
   node_config {
     spot = true # Sử dụng spot instance để tiết kiệm chi phí
-    machine_type    = "e2-small"
+    machine_type    = "custom-2-8192"
     service_account = "default"
 
     disk_size_gb = 15

@@ -11,6 +11,7 @@ locals {
     "sqladmin.googleapis.com",
     "servicenetworking.googleapis.com",
     "container.googleapis.com",
+    "secretmanager.googleapis.com",
   ]
 }
 

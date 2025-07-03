@@ -89,3 +89,19 @@ resource "google_compute_firewall" "gke_firewall" {
   source_ranges = ["10.1.0.0/20", "10.1.16.0/20", "10.1.32.0/20"]
   target_tags   = ["gke-node"]
 }
+
+# Firewall rule cho phép GKE kết nối với Cloud SQL và Proxy
+resource "google_compute_firewall" "gke_to_cloudsql" {
+  name    = "gke-to-cloudsql"
+  network = google_compute_network.diemne.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["5432"]
+  }
+
+  source_tags   = ["gke-node"]
+  source_ranges = ["10.1.0.0/20"]
+    # private_subnet (GKE nodes)
+  destination_ranges = ["10.2.0.0/20", google_compute_global_address.private_ip_alloc.address]  # db_subnet (Proxy) và dải IP peering
+}
