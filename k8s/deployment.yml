@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app
+  namespace: default
+  labels:
+    app: todo-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      labels:
+        app: todo-app
+    spec:
+      containers:
+      - name: todo-app
+        image: ghcr.io/diemdoo/hands-on/todo-app:b32582f  # Thay SHA_HASH bằng github.sha | substr 0 7
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DB_HOST
+          value: "10.99.0.3"  # Kết nối qua Cloud SQL Proxy trên localhost
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "todo"
+        - name: DB_USER
+          value: "todo"
+        - name: DB_PASS
+          value: "12345678"
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "256Mi"
+          limits:
+            cpu: "100m"
+            memory: "512Mi"
+      
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-app-service
+  namespace: default
+spec:
+  selector:
+    app: todo-app
+  ports:
+  - port: 80
+    targetPort: 5000
+    protocol: TCP
+  type: ClusterIP
+---
